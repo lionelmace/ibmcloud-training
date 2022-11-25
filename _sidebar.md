@@ -9,3 +9,5 @@
   - [Lab 4 - Volumes](lab-1-docker/lab-4-volumes.md)
   - [Lab 5 - Network](lab-1-docker/lab-5-network.md)
   - [Lab 6 - Advanced](lab-1-docker/lab-6-advanced.md)
+
+- Module 7 - DevOps
