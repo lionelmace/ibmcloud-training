@@ -18,14 +18,15 @@ ssh **VOTRE PRENOM**@**ADRESSE_IP**
 
 Nous avons vu que la façon la plus "courante" pour construire un image Docker était de partir d'une `Dockerfile`. Voyons cela:
 
+La premiere etape est de creer le fichier `Dockerfile`
+
 **Commande**
 
 ```bash
-cd k8s-labs/1-docker/2-images
-cat Dockerfile
+touch Dockerfile
 ```
 
-**Résultat**
+Editer ce fichier pour y ajouter ce contenu
 
 ```Dockerfile
 FROM alpine:latest
