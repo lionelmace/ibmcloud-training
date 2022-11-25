@@ -234,12 +234,13 @@ Nous allons maintenant re-déployer le pod Nginx, mais cette fois nous allons ut
 
 **Commande #13**
 
-```
-cd ~/k8s-labs/2-k8s-base/2-pods
-cat pod.yaml
+Creons le fichier pod.yaml
+
+```bash
+touch pod.yaml
 ```
 
-**Résultat**
+Editons le fichier pour rajouter le contenu yaml
 
 ```YAML
 apiVersion: v1
