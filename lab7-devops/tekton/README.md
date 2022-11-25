@@ -253,7 +253,9 @@ spec:
     - name: source-repo
       type: string
       description: Source code repository
-  tasks:
+    workspaces:
+      - name: pipeline-shared-data
+    tasks:
     - name: clone-repository
       params:
         - name: url
@@ -264,8 +266,6 @@ spec:
       workspaces:
         - name: output
           workspace: pipeline-shared-data
-  workspaces:
-    - name: pipeline-shared-data
 
 ```
 
@@ -481,8 +481,6 @@ spec:
       workspaces:
         - name: dir-with-readme
           workspace: pipeline-shared-data
-  workspaces:
-    - name: pipeline-shared-data
 ```
 
 This final YAML shows three important concepts:
@@ -600,8 +598,6 @@ spec:
       workspaces:
         - name: source
           workspace: pipeline-shared-data
-  workspaces:
-    - name: pipeline-shared-data
 ```
 
 
@@ -617,6 +613,8 @@ spec:
     - name: source-repo
       type: string
       description: Source code repository
+  workspaces:
+    - name: pipeline-shared-data
   tasks:
     - name: clone-repository
       params:
@@ -649,8 +647,6 @@ spec:
       workspaces:
         - name: source
           workspace: pipeline-shared-data
-  workspaces:
-    - name: pipeline-shared-data
 ```
 
 
@@ -811,6 +807,8 @@ spec:
     - name: image-registry
       type: string
       description: Docker image repository
+  workspaces:
+    - name: pipeline-shared-data
   tasks:
     - name: clone-repository
       params:
@@ -857,8 +855,6 @@ spec:
       workspaces:
         - name: source
           workspace: pipeline-shared-data
-  workspaces:
-    - name: pipeline-shared-data
 
 ```
 
@@ -1165,8 +1161,6 @@ Then modify the **pipeline.yaml** by adding a new parameter `app-name` and a new
       workspaces:
         - name: source
           workspace: pipeline-shared-data
-  workspaces:
-    - name: pipeline-shared-data
 ```
 
 Adding the new `manifest` task to the pipeline involved adding a new parameter `app-name`. You need to provide a value for this new parameter in the **pipelinerun.yaml**:
@@ -1182,9 +1176,9 @@ spec:
     - name: app-name
       value: nextapp
     - name: source-repo
-      value:  git@github.ibm.com:emea-ce-cloud-native-boot-camp-cohort-[X]/<your-name>-nextapp.git
+      value:  git@github.com/<your-name>/<your-name>-nextapp.git
     - name: image-registry
-      value: quay.io/<your-account>/nextapp
+      value: de.icr.io/lab-registry/<your-name>-nextapp
   pipelineRef:
     name: pipeline-nextapp
   workspaces:
@@ -1455,19 +1449,19 @@ roleRef:
   name: deployer
 ```
 
+Before deploying, you need the proper authorization for your deployment to pull the image from IBM Container Registry, this could be done it 2 ways, either adding a pull secret to the service account that runs the deployment, if no one is specified the `default` service account is used, or add a image pull secret in the deployment.
+```
+oc secrets link default ibmcloud-cr-credentials --for=pull
+oc get sa default -o yaml
+```
+![default-pull-secrets.png](images/default-pull-secrets.png)
 
 
-
-
-Now do the following:
+Now do the following (no need to push to git now as you only added openshift resources that you apply through oc commands):
 
 ```
-git add -A
-git commit -m "v6"
-git push -u origin main
 oc apply -f base/
 oc create -f pipelinerun.yaml
-tkn pr logs -f
 ```
 
 ![image-20211114163022994](images/image-20211114163022994.png)
@@ -1486,89 +1480,31 @@ To see the deployed application in the cloud, we open the OpenShift Console with
 
 
 
-And then click on the route to get access to the application:
+And then click on the route on the bottom right corner to get access to the application:
 
 ![image-20211114163342300](images/image-20211114163342300.png)
 
 
+**For information only:**    You may recall that you had to manually install the `npm` task when you first started working on the Pipeline. Having a dependency on a file hosted on hub.tekton.com means that it is highly likely you will forget to install the task when you move to a new OpenShift project.   Fortunately, you can use Kustomize to make sure that external dependencies are automatically installed. This will go through adding the following resource in **k8s/kustomization.yaml** and also ensure the pipeline service account has the right to create `Tasks`:
 
-You may recall that you had to manually install the `npm` task when you first started working on the Pipeline.
-
-Having a dependency on a file hosted on hub.tekton.com means that it is highly likely you will forget to install the task when you move to a new OpenShift project.
-
-Fortunately, you can use Kustomize to make sure that external dependencies are automatically installed.
-
-Next, open **k8s/kustomization.yaml** and add  the following resource:
-
-```yaml
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-resources:
-  - https://raw.githubusercontent.com/tektoncd/catalog/main/task/npm/0.1/npm.yaml
-  - deployment.yaml
-  - service.yaml
-  - route.yaml
-commonLabels:
-  app: nextapp
-  app.kubernetes.io/instance: nextapp
-  app.kubernetes.io/name: nextapp
-```
-To be able to add the npm Task you need to add the correct rights to your service account through  **base/role-deployer.yaml**
-Edit this file and update only the `verbs` for the `tasks` resources (you should now have 5 verbs rather that 2):
-
-```yaml
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: deployer
-rules:
-  # ... Omitted for brevity
-  - apiGroups:
-      - tekton.dev
-    resources:
-      - tasks
-    verbs:
-      - get
-      - create
-      - list
-      - patch
-      - watch
-```
-
-Update in on the cluster
-
-```
-oc apply -f base/role-deployer.yaml
-```
-
-Next, use the kustomize cli took to add all the yaml files in the base folder by running the following:
-
-```shell
-$:> cd k8s
-$:> kustomize edit add resource *.yaml
-$:> cd ..
-```
-
-Now, you can run `kubectl apply -k k8s` rather than `oc apply -f base`
-
-> Note: `oc apply -k base` may produce the following error:
->
-> ```
-> ... /base/https:: no such file or director
-> ```
->
-> If this happens, it is because `oc` is delegating to an older version of `kubectl` that shipped with `oc`
-
-Going forward, when you create a new file you should also add the file to the `resources` listed in `kustomization.yaml`
-
-
-
+  ```yaml
+  apiVersion: kustomize.config.k8s.io/v1beta1
+  kind: Kustomization
+  resources:
+    - https://raw.githubusercontent.com/tektoncd/catalog/main/task/npm/0.1/npm.yaml
+    - deployment.yaml
+    - service.yaml
+    - route.yaml
+  commonLabels:
+    app: nextapp
+    app.kubernetes.io/instance: nextapp
+    app.kubernetes.io/name: nextapp
+ ```
 
 
 ## TASK#6 Tekton Triggers
 
-![image-20211114103101191](images/image-20211114103101191.png)
-
+![image-20211114103101191.png](images/image-20211114103101191.png)
 
 
 [Tekton Triggers](https://github.ibm.com/tektoncd/triggers/blob/main/docs/README.md) gives you a way to listen to and extract data from events. The data in the event is then used to determine if a `PipelineRun`should be created and with what input values.
@@ -1582,63 +1518,18 @@ The [documentation](https://github.ibm.com/tektoncd/triggers/blob/main/docs/READ
 - **`EventListener`** - listens for events at a specified port on your Kubernetes cluster. Specifies one or more Triggers.
 - **`TriggerTemplate`** - specifies a blueprint for the resource, such as a TaskRun or PipelineRun, to execute when your EventListener receives an event. It exposes parameters that you can use anywhere within your resource's template.
 - **`TriggerBinding`** - specifies the fields in the event payload from which you want to extract data and the fields in your corresponding TriggerTemplate to populate with the extracted values. You can then use the populated fields in the TriggerTemplate to populate fields in the associated TaskRun or PipelineRun.
-
-You will follow the general approach outlined in [this getting started guide](https://github.ibm.com/tektoncd/triggers/blob/main/docs/getting-started/README.md). However, the following configuration varies slightly from the guide as a result of debugging an error encountered while writing this content. (Process documented below for the curious).
-
+ 
 
 
-### Event Listener
-
-The **base/webhook-receiver.yaml** should contain the following, please choose the appropriate version depending on the Tekton Trigger version that comes with the Pipelines Operator (**Note** You can see Tekton Triggers versions in the OpenShift console Operators > Installed Operators, select `Red Hat OpenShift Pipelines` and review the `Components` section, or run `tkn version` on your worstation):
-
-For Tekton Triggers  < v0.11.0:
-
-```yaml
-apiVersion: triggers.tekton.dev/v1alpha1
-kind: EventListener
-metadata:
-  name: webhook-receiver
-spec:
-  serviceAccountName: webhook-receiver
-  triggers:
-    - template:
-        name: webhook-receiver
-      bindings:
-        - ref: webhook-receiver
-```
-
-For Tekton Triggers >= v0.11.0:
-
-```yaml
-apiVersion: triggers.tekton.dev/v1alpha1
-kind: EventListener
-metadata:
-  name: webhook-receiver
-spec:
-  serviceAccountName: webhook-receiver
-  triggers:
-    - template:
-        ref: webhook-receiver
-      bindings:
-      - ref: webhook-receiver
-```
-
-[Tekton Triggers v0.11.0 Changes ](https://github.com/tektoncd/triggers/releases/tag/v0.11.0)
-
-The above yaml defines an [EventListener](https://tekton.dev/vault/triggers-v0.6.1/eventlisteners/), which is a declarative way to process incoming HTTP based events with JSON payloads (e.g.; GitHub Webhooks)
-
-Apply the change:
-
-```
-oc apply -f base/webhook-receiver.yaml
-```
 
 ### Trigger Template
 
-Since you have a Pipeline already, you need to create a `TriggerTemplate` to run your `Pipeline` from a `git push`. The `TriggerTemplate` specifies a blueprint for the `PipelineRun` to execute when a `git push` occurs:
+> You will create a singe file named ""trigger.yaml** that will contain the template, the binding and the roles. We will review each component indivivually before creating the complete file.
 
-next you will add a `TriggerTemplate` that will be used by the EventListener to run the Pipeline (**Note: you will create all the following resources in one file which full content is available after the detailed explanation**)
+Since you have a Pipeline already, you need to create a `TriggerTemplate` to run your `Pipeline` from a `git push`. The `TriggerTemplate` specifies a blueprint for the `PipelineRun` to execute when a `git push` occurs, and it can use fields from the git source event to be passed as parameters. In this example, we will not anymore pass the value for the **source-repo** parameter but rather extract it from the git event.
 
+
+Review the TriggerTemplate information:
 ```yaml
 # ... Omitted for brevity
 ---
@@ -1647,6 +1538,9 @@ kind: TriggerTemplate
 metadata:
   name: webhook-receiver
 spec:
+  params:
+    - name: source-repo
+      description: source repository ssh url injected from TriggerBinding  #  defines a parameter filled by the TriggerBinding
   resourcetemplates:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
@@ -1658,9 +1552,9 @@ spec:
           - name: app-name
             value: express-sample-app
           - name: image-registry
-            value: quay.io/<your-account>/nextapp
+            value: de.icr.io/lab-registry/<your-name>-nextapp   # to be changed
           - name: source-repo
-            value: git@github.ibm.com:emea-ce-cloud-native-boot-camp-cohort-[X]/<your-name>-nextapp.git
+            value: $(tt.params.source-repo)    #  Will be filled by git event thanks to TriggerBinding mapping
         pipelineRef:
           name: pipeline-nextapp
         workspaces:
@@ -1673,7 +1567,8 @@ spec:
 
 ### Trigger Binding
 
-Next you configure the `TriggerBinding` which is just a mapping of the webhook payload to parameters:
+
+Review the `TriggerBinding` which is just a mapping of the webhook payload to parameters, A TriggerBinding allows you to specify parameters (params) that Tekton passes to the corresponding TriggerTemplate. For each parameter, you must specify a name and a value field with the appropriate values
 
 ```yaml
 # ... Omitted for brevity
@@ -1682,6 +1577,10 @@ apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerBinding
 metadata:
   name: webhook-receiver
+spec:
+  params:
+    - name: source-repo
+      value: $(body.repository.ssh_url)
 ```
 
 > Note that the TriggerBinding is not doing anything at all at the moment. We will improve that later in this lesson.
@@ -1760,37 +1659,29 @@ subjects:
     kind: ServiceAccount
 ```
 
-Starting with `OpenShift Pipelines 1.5`, `Interceptor` becomes `ClusterInterceptor` so it is a cluster scoped resource. You will need to add a new ClusterRole ad ClusterRoleBinding to allow the `ServiceAccount` to access `clusterinterceptors` resources. **Note** Change **listener-trigger-interceptors-view-your-name**  and **your-name-nextapp** by your namespace name for the ClusterRoleBinding subjects.namespace.
+Starting with `OpenShift Pipelines 1.5`, `Interceptor` becomes `ClusterInterceptor` so it is a cluster scoped resource. A ClusterRole has been created for you and you will need to add a ClusterRoleBinding to allow the `ServiceAccount` to access `clusterinterceptors` resources.  
+
+Review the ClusterRole and its associated resources and verbs:
+```sh
+oc get clusterrole -o yaml aggregate-olm-edit-tekton
+```
+![clusterrole-tekton.png](images/clusterrole-tekton.png)
 
 ```yaml
 # ... Omitted for brevity
 ---
-kind: ClusterRole
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: webhook-receiver-interceptors-view
-rules:
-  - apiGroups:
-      - triggers.tekton.dev
-    resources:
-      - clusterinterceptors
-    verbs:
-      - get
-      - list
-      - watch
----
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: webhook-receiver-interceptors-view-<your-name>
+  name: aggregate-olm-edit-tekton-<your-name>   # to be changed
 subjects:
   - kind: ServiceAccount
     name: webhook-receiver
-    namespace: <your-name>-nextapp
+    namespace: lab-<your-name>
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: webhook-receiver-interceptors-view
+  name: aggregate-olm-edit-tekton
 ---
 ```
 
@@ -1806,12 +1697,13 @@ kind: Route
 metadata:
   name: webhook-receiver
 spec:
-  port:
-    targetPort: 8000
   to:
-    name: el-webhook-receiver
     kind: Service
+    name: el-webhook-receiver
     weight: 100
+  port:
+    targetPort: http-listener
+  wildcardPolicy: None
 ```
 
 > Note: the service name is `el-webhook-receiver` while the `metadata.name` of the `EventListener` is `webhook-receiver`. The `el-`prefix is added automatically by OpenShift.
@@ -1822,27 +1714,25 @@ Under normal circumstances the `Route` for `webhook-receiver` would not be expos
 
 ### Trigger.yaml
 
-You can put all the definitions in one file **trigger.yaml**: Please update the 'account' and 'project' parameters and the 'namespace' in the ClusterRoleBinding:
+You can put all the definitions in one file **trigger.yaml**: Please update `your-name` placeholders in parameters:
 
 ```yaml
-          - name: source-repo
-            value: git@github.ibm.com:emea-ce-cloud-native-boot-camp-cohort-[X]/<your-name>-nextapp.git
+  ### in TriggerTemplate
           - name: image-registry
-            value: quay.io/<your-account>/nextapp
-          - kind: ServiceAccount
-            name: webhook-receiver
-            namespace: <your-name>-nextapp
-  ....
-
+            value: de.icr.io/lab-registry/<your-name>-nextapp  # to be changed
+  ### in ClusterRoleBinding
+  kind: ClusterRoleBinding
+    metadata:
+    name: aggregate-olm-edit-tektonaggregate-olm-edit-tekton-<your-name> # to be changed
   subjects:
     - kind: ServiceAccount
       name: webhook-receiver
-      namespace: <your-name>-nextapp
+      namespace: lab-<your-name> # to be changed
 
 ```
 
 
-Here is the content:
+Here is the content for **trigger.yaml**:
 
 ```yaml
 apiVersion: v1
@@ -1895,38 +1785,27 @@ roleRef:
   kind: Role
   name: webhook-receiver
 ---
-kind: ClusterRole
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: webhook-receiver-interceptors-view
-rules:
-  - apiGroups:
-      - triggers.tekton.dev
-    resources:
-      - clusterinterceptors
-    verbs:
-      - get
-      - list
-      - watch
----
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: webhook-receiver-interceptors-viewwebhook-receiver-interceptors-view-<your-name>
+  name: aggregate-olm-edit-tekton-<your-name>   # To be changed
 subjects:
   - kind: ServiceAccount
     name: webhook-receiver
-    namespace: <your-name>-nextapp
+    namespace: lab-<your-name>   # To be changed
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: webhook-receiver-interceptors-view
+  name: aggregate-olm-edit-tekton
 ---
 apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerTemplate
 metadata:
   name: webhook-receiver
 spec:
+  params:
+    - name: source-repo
+      description: source repository ssh url injected from TriggerBinding
   resourcetemplates:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
@@ -1940,30 +1819,35 @@ spec:
           - name: app-name
             value: nextapp
           - name: source-repo
-            value: git@github.ibm.com:emea-ce-cloud-native-boot-camp-cohort-[X]/<your-name>-nextapp.git
+            value:  $(tt.params.source-repo)    #  Will be filled by git event thanks to TriggerBinding mapping
           - name: image-registry
-            value: quay.io/<your-account>/nextapp
+            value: de.icr.io/lab-registry/<your-name>-nextapp   # To be changed
         workspaces:
           - name: pipeline-shared-data
             persistentVolumeClaim:
-              claimName: nextapp-pipeline # this PVC must already exist
+              claimName: nextapp-pipeline    # this PVC must already exist
 ---
 apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerBinding
 metadata:
   name: webhook-receiver
+spec:
+  params:
+    - name: source-repo
+      value: $(body.repository.ssh_url)
 ---
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
   name: webhook-receiver
 spec:
-  port:
-    targetPort: 8000
   to:
     kind: Service
     name: el-webhook-receiver
     weight: 100
+  port:
+    targetPort: http-listener
+  wildcardPolicy: None
 ---
 ```
 
@@ -1974,6 +1858,35 @@ Apply the change:
 ```
 oc apply -f trigger.yaml
 ```
+![apply-trigger.png](images/apply-trigger.png)
+
+### Event Listener
+
+Create the **base/webhook-receiver.yaml** should contain the following:
+
+Defines an [EventListener](https://tekton.dev/vault/triggers-v0.6.1/eventlisteners/), which is a declarative way to process incoming HTTP based events with JSON payloads (e.g.; GitHub Webhooks)
+
+
+```yaml
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: webhook-receiver
+spec:
+  serviceAccountName: webhook-receiver
+  triggers:
+    - template:
+        ref: webhook-receiver
+      bindings:
+      - ref: webhook-receiver
+```
+
+
+Apply the change:
+
+```
+oc apply -f base/webhook-receiver.yaml
+```
 
 Ensure the webhook-receiver pod started successfully:
 
@@ -1982,13 +1895,12 @@ oc get pods | grep webhook-receiver
 el-webhook-receiver-7ff6f9cf4d-zd8s7                         1/1     Running     0          3m20s
 ```
 
-
+![running-event-listener.ong](images/running-event-listener.png)
 
 ### GitHub Webhook
 
-Next, in the GitHub UI, go to your GitHub **account** in the **nextapp repository**:
+Next, in the GitHub UI, go to your GitHub **account** in the **<your-name>nextapp** repository:
 
-![image-20211114154118240](images/image-20211114154118240.png)
 
 Go to **Settings** **> Hooks**
 
@@ -1996,24 +1908,22 @@ Go to **Settings** **> Hooks**
 
 Click **Add Webhooks**
 
-![image-20211114154413717](images/image-20211114154413717.png)
-
 In terminal, get the correct route:
 
 ```
 oc get route                       
 NAME           Host                                   PATH   SERVICES              PORT   TERMINATION   WILDCARD
-webhook-receiver   webhook-receiver-phthom-nextapp.cp4intpg-wdc04-x5pgfd-8946bbc006b7c6eb0829d088919818bb-0000.us-east.containers.appdomain.cloud          el-webhook-receiver   8080                 None
+webhook-receiver   webhook-receiver-cjonvel-nextapp.5pgfd-8946bbc006b7c6eb0829d088919818bb-0000.us-east.containers.appdomain.cloud          el-webhook-receiver   8080                 None
 
 ```
 
 Change the route to your listener URL (be careful to use http:// and not https://, default routes are not using TLS):
 
 ```
-http://webhook-receiver-phthom-nextapp.cp4intpg-wdc04-x5pgfd-8946bbc006b7c6eb0829d088919818bb-0000.us-east.containers.appdomain.cloud
+http://webhook-receiver-cjonvel-nextapp.5pgfd-8946bbc006b7c6eb0829d088919818bb-0000.us-east.containers.appdomain.cloud
 ```
 
-Change the `Content type` to `application/json`.
+Change the `Content type` to `application/json` and the select `Send me everything` 
 
 ![image-20211114154927173](images/image-20211114154927173.png)
 
@@ -2023,7 +1933,7 @@ Then click **Add webhook**
 ![image-20211114155026188](images/image-20211114155026188.png)
 
 
-In IBM GitHub Enterprise, a event is sent as soon as the hook is created, if this is not the case,  modify the `k8s/deployment.yaml` file in your project by adding a `app.openshift.io/runtime` label.
+An event is sent as soon as the webhook is created, if this is not the case, modify the `k8s/deployment.yaml` file in your project by adding a `app.openshift.io/runtime` label and push it to GitHub to trigger the webhook.
 
 ```yaml
 kind: Deployment
@@ -2043,7 +1953,7 @@ git push -u origin main
 tkn pr list
 ```
 
-When the hook as been succesfully delivered, liste the pipeline runs to view the triggered pipeline!
+When the webook as been succesfully delivered, liste the pipeline runs to view the triggered pipeline!
 
 ```
 tkn pr list
@@ -2057,13 +1967,7 @@ tkn pr list
 
 
 
-Now you can go to the Developer perspective:
-
-![image-20211116082317549](images/image-20211116082317549.png)
-
-
-
-In the <account>-nextapp, you will see the Triggers application and deployment. Click in the sample-app, you will see the details for that application:
+Now you can go to the Developer perspective and in your **your-name-nextapp** project, you will see the Triggers application and deployment. Click in the sample-app, you will see the details for that application:
 
 ![image-20211116082715729](images/image-20211116082715729.png)
 
@@ -2073,7 +1977,7 @@ Click in the **Routes** link to get access to the application.
 
 ![image-20211116082841634](images/image-20211116082841634.png)
 
-Edit the following file: **pages/index.js**
+Now let's make a change visible in the application by editing the following file: **pages/index.js**
 
 Find the line with  `Welcome to` text around line 16.
 
@@ -2081,7 +1985,7 @@ Find the line with  `Welcome to` text around line 16.
 
 
 
-Change this line by adding some text (Hello Philippe for instance)
+Change this line by adding some text (Hello 'your-name' for instance)
 
 ![image-20211116083917943](images/image-20211116083917943.png)
 
@@ -2110,7 +2014,7 @@ When successfully finished, go to the Topology view in the Developer perspective
 
 
 
-And click on the Route link to the application:
+And click on the Route link to the application and see the new version of the application!
 
 ![image-20211116085523421](images/image-20211116085523421.png)
 
