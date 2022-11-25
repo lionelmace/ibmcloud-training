@@ -19,4 +19,4 @@
   - [Lab 6 - ibm registry](lab-2-kubernetes/k8s-lab-6-ibm-registry.md)
 
 - Module 7 - DevOps
-  - [:book: DevOps](lab7-devops/readme.md)
+  - [:book: DevOps](lab7-devops/tekton/README.md)
