@@ -20,7 +20,7 @@ Commençons par supprimer une éventuelle instance de container Nginx:
 
 **Commande**
 
-```
+```bash
 docker rm -f nginx
 ```
 
@@ -54,7 +54,7 @@ Nous allons maintenant créer un container qui utilise cette page grâce à un v
 
 **Commande**
 
-```
+```bash
 docker run -d --name nginx -p 80:80 -v ~/k8s-labs/1-docker/4-volumes:/usr/share/nginx/html:ro nginx:alpine
 ```
 
@@ -80,8 +80,8 @@ Vérifions notre page web en allant sur http://votre.adresse.ip. On peut aussi t
 
 **Commande**
 
-```
-echo "<H1>Issa Nissa</H1>" > ~/k8s-labs/1-docker/4-volumes/index.html
+```bash
+echo "<H1>Issa Nissa</H1>" > ./volume/index.html
 ```
 
 Puis rééssayons de nous connecter sur http://votre.adresse.ip (ou `curl localhost`), le message a bien changé !
@@ -96,7 +96,7 @@ On peut même arrêter le container:
 
 **Commande**
 
-```
+```bash
 docker stop nginx
 ```
 
@@ -111,14 +111,14 @@ Et modifier à nouveau notre contenu:
 **Commande**
 
 ```
-echo "<H1>I've been modified while container was not there</H1>" > ~/k8s-labs/1-docker/4-volumes/index.html
+echo "<H1>I've been modified while container was not there</H1>" > ./volume/index.html
 ```
 
 et finalement démarrer le container:
 
 **Commande**
 
-```
+```bash
 docker start nginx
 ```
 
@@ -135,4 +135,3 @@ Puis si on se connecte sur http://votre.adresse.ip (ou `curl localhost`), le mes
 ```html
 <H1>I've been modified while container was not there</H1>
 ```
-
