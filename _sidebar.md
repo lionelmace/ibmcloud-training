@@ -18,5 +18,5 @@
   - [Lab 5 - kubernetes services](lab-2-kubernetes/k8s-lab-5-services.md)
   - [Lab 6 - ibm registry](lab-2-kubernetes/k8s-lab-6-ibm-registry.md)
 
-- [Module 7 - DevOps]
+- Module 7 - DevOps
   - [:book: DevOps](lab7-devops/readme.md)
