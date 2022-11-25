@@ -21,7 +21,7 @@ On va se connecter à IBM Cloud, le temps du lab (l'`API_KEY` vous a -normalemen
 **Commande #1**
 
 ```
-ibmcloud login --apikey **API_KEY** -r eu-de -g BSC-Garage -c c7ab6a05ec1e3eb13f5e81aa302bdbd0
+ibmcloud login --apikey **API_KEY** -r eu-de -g lab -c 0b5a00334eaf9eb9339d2ab48f7326b4
 ```
 
 **Résultat**
@@ -31,18 +31,18 @@ API endpoint: https://cloud.ibm.com
 Authenticating...
 OK
 
-Targeted account CPL@fr ibm com's Account (c7ab6a05ec1e3eb13f5e81aa302bdbd0) <-> 393750
+Targeted account ACME (0b5a00334eaf9eb9339d2ab48f7326b4) <-> 393750
 
-Targeted resource group BSC-Garage
+Targeted resource group lab
 
 Targeted region eu-de
 
 
 API endpoint:      https://cloud.ibm.com
 Region:            eu-de
-User:              nicolas.comete@fr.ibm.com
-Account:           CPL@fr ibm com's Account (c7ab6a05ec1e3eb13f5e81aa302bdbd0) <-> 393750
-Resource group:    BSC-Garage
+User:              first.lastname@fr.ibm.com
+Account:           ACME (0b5a00334eaf9eb9339d2ab48f7326b4) <-> 393750
+Resource group:    lab
 CF API endpoint:
 Org:
 Space:
@@ -52,31 +52,23 @@ Et on va aussi se connecter à notre cluster:
 
 **Commande #2**
 
-```
-ibmcloud ks cluster config --cluster **CLUSTER_NAME**
+```bash
+export CLUSTER_NAME=**CLUSTER_NAME**
 ```
 
 Le `CLUSTER_NAME` vous a également été transmis par mail.
 
-### Quelques aliases... et de l'autocompletion !
-
-Pour les labs à venir, votre VM dispose de 3 aliases utiles:
-
-- `k` pour `kubectl`
-- `i` pour `ibmcloud`
-- `d` pour `docker`
-
-Par ailleurs, la commande `kubectl` (tout comme son alias `k`) dispose de l'autocomplétion: un appui sur `<Tab>` pour mle début d'une commande ou d'un item permet la complétion automatique.
+```bash
+ibmcloud ks cluster config --cluster $CLUSTER_NAME
+```
 
 ### Chacun chez soi
-
-Pour ce lab, la configuration pour la ligne de commande `kubectl` devrait déjà être faite pour se connecter au cluster Kubernetes créé sur IBM Cloud (et qui sera partagé par tous les participants). 
 
 Nous allons commencer par créer un namespace dans lequel vont se dérouler les différents labs:
 
 **Commande #3**
 
-```
+```bash
 kubectl create namespace $USER
 ```
 
