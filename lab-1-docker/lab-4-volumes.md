@@ -36,11 +36,13 @@ Nous allons maintenant remplacer la page d'accueil HTML par une page personnalis
 
 **Commande**
 
-```
-cat ~/k8s-labs/1-docker/4-volumes/index.html
+La premiere etape est de creer la nouvelle page HTML
+
+```bash
+touch index.html
 ```
 
-**Résultat**
+Editer ce fichier pour y ajouter ce contenu
 
 ```html
 <H1>Hello from IBM Garage for Cloud !</H1>
