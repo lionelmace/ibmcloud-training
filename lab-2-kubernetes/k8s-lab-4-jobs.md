@@ -333,7 +333,7 @@ touch cronjob.yaml
 Editons le fichier avec le contenu yaml suivant
 
 ```YAML
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: say-time
