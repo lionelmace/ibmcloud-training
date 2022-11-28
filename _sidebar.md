@@ -10,7 +10,7 @@
   - [Lab 5 - Network](lab-1-docker/lab-5-network.md)
   - [Lab 6 - Advanced](lab-1-docker/lab-6-advanced.md)
 
-- Module 1 - Kubernetes
+<!-- - Module 1 - Kubernetes
   - [Lab 1 - kubernetes CLI](lab-2-kubernetes/k8s-lab-1-cli.md)
   - [Lab 2 - kubernetes pods](lab-2-kubernetes/k8s-lab-2-pods.md)
   - [Lab 3 - kubernetes deployment](lab-2-kubernetes/k8s-lab-3-deployments.md)
@@ -19,4 +19,4 @@
   - [Lab 6 - ibm registry](lab-2-kubernetes/k8s-lab-6-ibm-registry.md)
 
 - Module 7 - DevOps
-  - [:book: DevOps](lab7-devops/tekton/README.md)
+  - [:book: DevOps](lab7-devops/tekton/README.md) -->

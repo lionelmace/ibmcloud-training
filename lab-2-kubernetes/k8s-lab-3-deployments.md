@@ -20,12 +20,13 @@ C'est le retour du YAML... il va falloir s'y habituer ! Nous allons donc créer 
 
 **Commande #1**
 
+Creons le fichier deployment.yaml
+
 ```
-cd ~/k8s-labs/2-k8s-base/3-deployments
-cat deployment.yaml
+touch deployment.yaml
 ```
 
-**Résultat**
+Editons le fichier pour rajouter le contenu yaml
 
 ```YAML
 apiVersion: apps/v1
@@ -202,11 +203,13 @@ La encore, nous allons nous appuyer sur un fichier YAML.
 
 **Commande #10**
 
+Creons le fichier statefulset.yaml
+
 ```
-cat statefulset.yaml
+touch statefulset.yaml
 ```
 
-**Résultat**
+Editons le fichier avec le contenu yaml suivant
 
 ```YAML
 apiVersion: apps/v1
