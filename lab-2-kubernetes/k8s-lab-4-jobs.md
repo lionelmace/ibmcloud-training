@@ -521,4 +521,3 @@ kubectl delete -f initcontainer.yaml
 ```
 pod "delayed-app" deleted
 ```
-

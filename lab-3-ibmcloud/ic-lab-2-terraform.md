@@ -1,0 +1,1 @@
+The lab is available at [https://github.com/lionelmace/learn-ibm-terraform](https://github.com/lionelmace/learn-ibm-terraform).
