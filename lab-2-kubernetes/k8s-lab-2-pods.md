@@ -309,7 +309,7 @@ ou
 nano pod.yaml
 ```
 
-On va rajouter en toute fin de fichier les lignes suivantes (en gros: on crée un deuxième container qui ne fait que dormir pendant un an):
+On va rajouter en toute fin de fichier les lignes suivantes (en gros: on crée un deuxième container qui ne fait que dormir pendant un jour):
 
 ```YAML
   - name: sleeping-beauty
