@@ -20,12 +20,13 @@ Nous allons créer un job à partir de l'image Docker `alpine`. Toujours du YAML
 
 **Commande #1**
 
-```YAML
-cd ~/k8s-labs/2-k8s-base/4-jobs
-cat job.yaml
+Creons le fichier job.yaml
+
+```
+touch job.yaml
 ```
 
-**Résultat**
+Editons le fichier avec le contenu yaml suivant
 
 ```YAML
 apiVersion: batch/v1
@@ -323,11 +324,13 @@ Voyons comment ça marche:
 
 **Commande #12**
 
-```
-cat cronjob.yaml
+Creons le fichier cronjob.yaml
+
+```bash
+touch cronjob.yaml
 ```
 
-**Résultat**
+Editons le fichier avec le contenu yaml suivant
 
 ```YAML
 apiVersion: batch/v1beta1
@@ -424,6 +427,7 @@ cronjob.batch "say-time" deleted
 Nous allons donc créer un déploiement qui utilise un init container. Voyons à quoi ressemble le YAML:
 
 **Commande #17**
+
 
 ```
 cat initcontainer.yaml

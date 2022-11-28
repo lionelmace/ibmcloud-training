@@ -16,7 +16,7 @@
   - [Lab 3 - kubernetes deployment](lab-2-kubernetes/k8s-lab-3-deployments.md)
   - [Lab 4 - kubernetes jobs](lab-2-kubernetes/k8s-lab-4-jobs.md)
   - [Lab 5 - kubernetes services](lab-2-kubernetes/k8s-lab-5-services.md)
-  - [Lab 6 - ibm registry](lab-2-kubernetes/k8s-lab-6-ibm-registry.md)
+  <!-- - [Lab 6 - ibm registry](lab-2-kubernetes/k8s-lab-6-ibm-registry.md) -->
 
 <!-- - Module 7 - DevOps
   - [:book: DevOps](lab7-devops/tekton/README.md) -->
