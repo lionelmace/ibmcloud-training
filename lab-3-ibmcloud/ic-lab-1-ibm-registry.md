@@ -1,4 +1,4 @@
-# Kubernetes - Lab 6: le registre privé IBM Cloud
+# Lab: le registre privé IBM Cloud
 
 ## Prereqs
 
@@ -176,95 +176,138 @@ node
 
 Voilà qui est fait.
 
-### Ici Londres
+### Ici Frankfurt
 
-Nous allons utiliser un registre privé sur IBM Cloud hébergé à Londres.
+Nous allons utiliser un registre privé sur IBM Cloud hébergé à Frankfurt.
 
 **Commande #6**
 
 ```
-ibmcloud cr region-set eu-gb
+ibmcloud cr region-set eu-de
 ```
 
 **Résultat**
 
 ```
-The region is set to 'uk-south', the registry is 'uk.icr.io'.
+The region is set to 'eu-central', the registry is 'de.icr.io'.
 
 OK
 ```
 
-Nous allons maintenant lancer le build de l'image sur IBM Cloud:
+Nous allons maintenant lancer le build de l'image:
 
 **Commande #7**
 
 ```
-i cr build -t k8s-lab/node-${USER} --build-arg user=$USER .
+docker build -t de.icr.io/lab-registry/node-${USER} --build-arg user=$USER .
 ```
 
-- `i`: un autre alias (pour `ibmcloud`)
-- `k8s-lab/`: notre "namespace" sur le registre IBM Cloud (à Londre donc)
-
-Noter la syntaxe: `docker` est remplacé par `i cr`; les autres arguments restant quasiment identiques.
+- `de.icr.io`: le registre IBM Cloud (à Frankfurt donc)
+- `lab-registry/`: notre "namespace" sur le registre IBM Cloud 
 
 **Résultat**
 
 ```
-Sending build context to Docker daemon  4.096kB
-Step 1/8 : FROM node:14
- ---> 173eeb895217
-Step 2/8 : ARG user
- ---> Using cache
- ---> b7287d8c3fd1
-Step 3/8 : ENV user=$user
- ---> Using cache
- ---> 7d5d5a19ed8c
-Step 4/8 : WORKDIR /usr/src/app
- ---> Using cache
- ---> 9b9395c38a85
-Step 5/8 : COPY package*.json app.js ./
- ---> Using cache
- ---> 41bb8bc1e51c
-Step 6/8 : RUN npm install
- ---> Using cache
- ---> 3dfa0d4f0ae1
-Step 7/8 : EXPOSE 3000
- ---> Using cache
- ---> 755a0e0a640c
-Step 8/8 : CMD ["node", "app.js"]
- ---> Using cache
- ---> 9b8af2c81d6b
-Successfully built 9b8af2c81d6b
-Successfully tagged private.uk.icr.io/k8s-lab/node-student:latest
-The push refers to repository [private.uk.icr.io/k8s-lab/node-student]
-d86cd812f16a: Pushed
-824c17cf5e14: Pushed
-796f6c5c7553: Pushed
-24a8e30559a7: Pushed
-58b4b808347b: Pushed
-e404bec46f40: Pushed
-174e334f3f46: Pushed
-cbe6bbd0c86f: Pushed
-ef5de533cb53: Pushed
-a4c504f73441: Pushed
-e8847c2734e1: Pushed
-b323b70996e4: Pushed
-latest: digest: sha256:e140f3a482407700ca49e68f419d406e7474e26903f737b90cd01d528ef18d42 size: 2840
+[+] Building 1.4s (10/10) FINISHED
+ => [internal] load build definition from Dockerfile
+ => => transferring dockerfile: 37B
+ => [internal] load . dockerignore
+ => => transferring context: 2B      
+ => [internal] load metadata for docker.io/library/node:14     
+ => [auth] library/node:pull token for registry-1.docker.io
+ => [1/4] FROM docker.io/library/node:14@sha256:d82d512aec5de4fac53b92b2aa148948c2e72264d650de9e1570283d4f503dbe
+ => [internal] load build context
+ => => transferring context: 60B
+ => CACHED [2/4] WORKDIR /usr/src/app
+ => CACHED [3/4] COPY package*.json app.js ./
+ => CACHED [4/4] RUN npm install
+ => exporting to image
+ => => exporting layers
+ => => writing image sha256:889482bc292667647f00cd9b4d74ce76a37e3884e3795ee3487e64f56bc1f627
+ => => naming to docker.io/lab-registry/node-user
 
 OK
 ```
 
-On note deux différences avec le `docker build` de la commande #2:
-
-- L'image est construite _sur IBM Cloud_: le Docker daemon d'IBM Cloud ne reçoit que le contenu du dossier local (`Dockerfile`, `app.js`et `package.json`); le reste des opérations se fait sur le cloud, ce qui est bien commode quand la bande passante de notre machine locale est limitée !
-- L'image est taggée et publiée sur le registre privé d'IBM Cloud
-
-Vérifions que notre image est bien présente:
+Poussons notre image sur le cloud IBM
 
 **Commande #8**
 
 ```
-i cr images --restrict k8s-lab
+docker push de.icr.io/lab-registry/node-${USER}
+```
+
+**Resultats**
+
+```
+Using default tag: latest
+The push refers to repository [de.icr.io/lab-registry/node-lionelmace]
+ffde200139d5: Preparing
+b6137117ad5a: Preparing
+bb2a2bba460b: Preparing
+f13fb423faca: Preparing
+72e196931421: Preparing
+64c220e07117: Waiting
+595dd2bd3de6: Waiting
+371dda325867: Waiting
+381f4f0a6ea8: Waiting
+155c77c325cb: Waiting
+4d19f53ef378: Waiting
+d6dff9eed369: Waiting
+unauthorized: The login credentials are not valid, or your IBM Cloud account is not active.
+```
+
+C'est normal. Il faut d'abord se connecter au registre.
+
+**Commande #9**
+
+```
+ibmcloud cr login
+```
+
+**Résultat**
+
+```
+Logging 'docker' in to 'de.icr.io'...
+Logged in to 'de.icr.io'.
+
+OK
+```
+
+On est bien connecte. Relancons le push de l'image
+
+**Commande #10**
+
+```
+docker push de.icr.io/lab-registry/node-${USER}
+```
+
+**Résultat**
+
+```
+Using default tag: latest
+The push refers to repository [de.icr.io/lab-registry/node-lionelmace]
+ffde200139d5: Pushed
+b6137117ad5a: Pushed
+bb2a2bba460b: Pushed
+f13fb423faca: Pushed
+72e196931421: Pushed
+64c220e07117: Pushed
+595dd2bd3de6: Pushed
+371dda325867: Pushed
+381f4f0a6ea8: Pushed
+155c77c325cb: Pushed
+4d19f53ef378: Pushed
+d6dff9eed369: Pushed
+latest: digest: sha256:772e025d88c42e56f59fe8385eaf6fe885fc48535a776514cdb998e5e7dde1c5 size: 2840
+```
+
+Vérifions que notre image est bien présente:
+
+**Commande #11**
+
+```
+ibmcloud cr images --restrict lab-registry
 ```
 
 **Résultat**
@@ -282,10 +325,10 @@ Super. Selon les cas, vous verrez sûrement les images des autres participants..
 
 À noter que cette image semble avoir des problèmes (`3 issues`). Voyons cela en détails:
 
-**Commande #9**
+**Commande #12**
 
 ```
-i cr va uk.icr.io/k8s-lab/node-student:latest
+ibmcloud cr va de.icr.io/lab-registry/node-lionelmace:latest
 ```
 
 - `va`: `vulnerability` `a`dvisor
@@ -295,9 +338,9 @@ i cr va uk.icr.io/k8s-lab/node-student:latest
 **Résultat**
 
 ```
-Checking security issues for 'uk.icr.io/k8s-lab/node-student:latest'...
+Checking security issues for 'de.icr.io/lab-registry/node-lionelmace:latest'...
 
-Image 'uk.icr.io/k8s-lab/node-student:latest' was last scanned on Wed Sep 16 14:18:40 UTC 2020
+Image 'de.icr.io/lab-registry/node-lionelmace:latest' was last scanned on Mon Nov 28 21:53:10 UTC 2022
 The scan results show that 3 ISSUES were found for the image.
 
 Configuration Issues Found
@@ -312,189 +355,6 @@ application_configuration:mysql.ssl-cert   Active          A setting in /etc/mys
                                                            against its CA certificate.
 application_configuration:mysql.ssl-key    Active          A setting in /etc/mysql/my.cnf that identifies the   ssl-key is not specified in /etc/mysql/my.cnf.
                                                            server private key.
-
-OK
 ```
 
 En gros: il y a des problèmes liés à des certificats SSL sur notre image. Bon à savoir... comme nous n'avons pas défini de restriction de déploiement pour nos images, rien ne nous empêche d'aller plus loin.
-
-Nous allons maintenant créer un pod qui se base sur cette image:
-
-**Commande #10**
-
-```
-kubectl run node --image=uk.icr.io/k8s-lab/node-$USER
-```
-
-**Résultat**
-
-```
-pod/node created
-```
-
-Attendons que le pod soit fonctionnel:
-
-**Commande #11**
-
-```
-k get pod -l run=node --watch
-```
-
-- `-l run=node`: le se`l`ector pour l'image que la commande `kubectl run` a taggée pour nous
-- `--watch`: la commande est automatiquement "rafraîchie"
-
-**Résultat**
-
-```
-NAME   READY   STATUS         RESTARTS   AGE
-node   0/1     ErrImagePull   0          4s
-```
-
-Diantre ! C'est un échec. Voyons pourquoi (`<Ctrl><C>`pour interrompre l'affichage):
-
-**Commande #12**
-
-```
-k describe pod node
-```
-
-**Résultat (tronqué)**
-
-```
- (...)
- Failed to pull image "uk.icr.io/k8s-lab/node-student": rpc error: code = Unknown desc = failed to pull and unpack image "uk.icr.io/k8s-lab/node-student:latest": failed to resolve reference "uk.icr.io/k8s-lab/node-student:latest": failed to authorize: failed to fetch anonymous token: unexpected status: 401 Unauthorized
- (...)
-```
-
-OK, en fait on aurait dû s'y attendre: on a dit que le registre était privé et on nous n'avons jamais renseigné de credentials ! 
-
-Nous allons donc créer un "secret" spécifique (les secrets seront vus plus en détail dans le prochain training):
-
-**Commande #13**
-
-```
-kubectl create secret docker-registry uk-icr-io --docker-server=uk.icr.io --docker-username=iamapikey --docker-email=iamapikey --docker-password=**API_KEY**
-```
-
-(remplacez `**API_KEY**` par celle qui vous a été envoyée par mail).
-
-**Résultat**
-
-```
-secret/uk-icr-io created
-```
-
-Nous allons maintenant re-créer le pod (rappelez-vous qu'il est "immutable" pour l'essentiel) en lui indiquant d'utiliser cette fois notre secret fraîchement créé:
-
-**Commande #14**
-
-```
-kubectl delete pod node && kubectl run node --image=uk.icr.io/k8s-lab/node-$USER --overrides='{ "spec": { "imagePullSecrets": [{"name": "uk-icr-io"}] } }'
-```
-
-- `--overrides='{...}'`: le paramètre à modifier / créer dans le YAML / JSON de déploiement
-
-**Résultat**
-
-```
-pod "node" deleted
-pod/node created
-```
-
-Allons voir à quoi ressemble les informations de ce pod:
-
-**Commande #15**
-
-```
-k get pod node -o yaml
-```
-
-**Résultat (tronqué)**
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  annotations:
-(...)
-  containers:
-  - image: uk.icr.io/k8s-lab/node-student
-(...)
-  imagePullSecrets:
-  - name: uk-icr-io
-(...)
-```
-
-On voit:
-
-- l'image: `uk.icr.io/k8s-lab/node-student` (`latest`est implicite)
-- le "pull secret" (en gros: les credentials qui nous permettent de "pull" l'image):  `uk-icr-io`
-
-Plus qu'à attendre que le pod soit (enfin) prêt:
-
-**Commande #16**
-
-```
-k get pod -l run=node --watch
-```
-
-**Résultat**
-
-```
-NAME                                READY   STATUS              RESTARTS   AGE
-nginx-deployment-5c559d5697-482dn   1/1     Running             0          7h14m
-nginx-deployment-5c559d5697-fqk5r   1/1     Running             0          7h14m
-nginx-deployment-5c559d5697-tfmbr   1/1     Running             0          7h14m
-node                                0/1     ContainerCreating   0          14s
-node                                1/1     Running             0          25s
-```
-
-Ouf! Cette fois, on dirait bien que le pod s'est déployé! Exposons le en tant que service "Node Port":
-
-**Commande #17**
-
-```
-k expose pod node --type=NodePort --port=3000
-```
-
-- `pod node`: on expose le pod `node`
-- `--port=3000`: le port exposé par notre container était le `3000`
-
-Vérifions notre Node Port:
-
-**Commande #17**
-
-```
-k get services
-```
-
-**Résultat**
-
-```
-NAME             TYPE       CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
-nginx-nodeport   NodePort   172.21.144.16    <none>        80:30617/TCP     6h28m
-node             NodePort   172.21.118.190   <none>        3000:30663/TCP   61s
-```
-
-Dans notre cas c'est donc le port `30663`. Vérifions en allant sur `http://**CLUSTER_BASE_URL**:**NODE_PORT**`: vous devriez voir:
-
-```
-Hello World from **VOTRE_NOM**!
-```
-
-Allez un peu de nettoyage pour finir:
-
-**Commande #18**
-
-```
-k delete service/node && k delete pod/node && k delete secret/uk-icr-io
-```
-
-**Résultat**
-
-```
-service "node" deleted
-pod "node" deleted
-secret "uk-icr-io" deleted
-```
-
