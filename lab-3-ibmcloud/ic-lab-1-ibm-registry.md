@@ -362,10 +362,10 @@ Super. Selon les cas, vous verrez sûrement les images des autres participants..
 **Commande #13**
 
 ```
-ibmcloud cr va de.icr.io/lab-registry/node-lionelmace:latest
+ibmcloud cr va de.icr.io/lab-registry/votre-image:latest
 ```
 
-- `va`: `vulnerability` `a`dvisor
+- `va`: `vulnerability advisor`
 
 *Note: il peut être nécessaire de patienter quelques instants que le scan de l'image ait pû être fait sur IBM Cloud (vous aurez dans ce cas une erreur de type `BXNVA0009E`)*
 
