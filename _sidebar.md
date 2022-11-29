@@ -19,7 +19,7 @@
 
 - Module 5 - IBM Cloud
   - [Lab 1 - IBM Container Registry](lab-3-ibmcloud/ic-lab-1-ibm-registry.md)
-  - [Lab 2 - IBM Terraform Provider](lab-3-ibmcloud/ic-lab-2-terraform.md)
+  <!-- - [Lab 2 - IBM Terraform Provider](lab-3-ibmcloud/ic-lab-2-terraform.md) -->
 
 <!-- - Module 7 - DevOps
   - [:book: DevOps](lab7-devops/tekton/README.md) -->
