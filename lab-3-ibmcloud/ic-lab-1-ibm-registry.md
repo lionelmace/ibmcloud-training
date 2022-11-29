@@ -232,6 +232,8 @@ Nous allons maintenant lancer le build de l'image:
 
 ```
 docker build -t de.icr.io/lab-registry/node-${USER} --build-arg user=$USER .
+
+docker tag sfillslabs/nom-de-votre-iamge de.icr.io/lab-registry/nom-de-votre-iamge
 ```
 
 - `de.icr.io`: le registre IBM Cloud (à Frankfurt donc)
@@ -390,3 +392,5 @@ application_configuration:mysql.ssl-key    Active          A setting in /etc/mys
 ```
 
 En gros: il y a des problèmes liés à des certificats SSL sur notre image. Bon à savoir... comme nous n'avons pas défini de restriction de déploiement pour nos images, rien ne nous empêche d'aller plus loin.
+
+L'image est visible dans la console sur l'URL [https://cloud.ibm.com/registry/start](https://cloud.ibm.com/registry/start).
