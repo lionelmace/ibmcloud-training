@@ -2,9 +2,11 @@
 
 ## Objective
 
-The objective of this worked example is to show how to introduce GitOps in a CI/CD pipline. Instead of modifying the pipeline from the Tekton Lab you will create a new one and only modify the EventListener. Besides the pipeline you will also create a new configuration repository for the application where only the manifest files will reside. Let's get started with the configuration repository.
+The objective of this worked example is to show how to introduce GitOps in a CI/CD pipline. Instead of modifying the pipeline from the Tekton Lab you will create a new one and only modify the EventListener. Besides the pipeline you will also create a new configuration repository for the application where only the manifest files will reside. 
+
+![lab-action-chain.png](images/lab-action-chain.png)
  
-## Create the configuration repository for the application
+## Create the new configuration repository for the application
 
 1. On GitHub create the repo using the UI, name it `<your-name>-nextapp-config`
 
@@ -67,7 +69,7 @@ The objective of this worked example is to show how to introduce GitOps in a CI/
 
 ## Create new Pipeline artefacts
 
-1. Ensure you are logged into your OpenShift cluster and go to your called **<lab-your-name**:
+1. Ensure you are logged into your OpenShift cluster and go to your called **<ab-your-name**:
 
     ```
     oc project lab-<your-name>
@@ -369,15 +371,21 @@ The objective of this worked example is to show how to introduce GitOps in a CI/
 
 ## Create the GitOps application
 
-1. Delete the previous nextapp deployment and resources
+1. Delete the deployment that was done in the previous lab and its associated resources. There could be conflict on some fields that are immutable and cause the deployment to fail.
    ```sh
     oc delete deployment sample-app
     oc delete service sample-app
     oc delete route sample-app
     ```
      
-1. Annotate the project for Argo CD
+1. To allow a namespace to be a deloyment target for Argo CD, it needs to be annotated. When the namespace has been created fot this lab for your user, the `argocd.argoproj.io/managed-by=openshift-gitops` annotation has been added to the **lab-your-name** project. Display your project properties to visualize it:
 
+    ```sh
+    oc get namespace -o yaml lab-<your-name>
+    ```
+    ![project-annotation.png](images/project-annotation.png)
+
+     For information, the command to annotate is:
     ```sh
     oc label namespace lab-<your-name> argocd.argoproj.io/managed-by=openshift-gitops
     ```

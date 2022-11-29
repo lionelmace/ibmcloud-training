@@ -10,7 +10,7 @@
 
 ## Introduction
 
-In this example, we are going to go thru a typical pipeline example using Tekton. Developers are commiting/pushing some code in a Git repository. This should normally trigger automatically a series of action (that I called an action chain) to clone, test, build and deploy to a Dev environment and then to a Prod environment.
+In this example, we are going to go through a typical pipeline example using Tekton. Developers are commiting/pushing some code in a Git repository. This should normally trigger automatically a series of action (that I called an action chain) to clone, test, build and deploy to a Dev environment and then to a Prod environment.
 
 ![image-20211108110940173](images/image-20211108110940173.png)
 
@@ -1221,7 +1221,7 @@ tkn pr logs pipelinerun-nextapp-<number>
 
 
 
-## TASK#5 Deploy
+## TASK#5 Deploy to dev
 
 ![image-20211114095908488](images/image-20211114095908488.png)
 
@@ -1994,7 +1994,7 @@ Change this line by adding some text (Hello 'your-name' for instance)
 Then we are going to **commit and push** the change, so that the pipeline will run again.
 
 
-
+Client Native Bootcamp 2022 -Tekton v0-1.pptx
 Do the following:
 
 ```
