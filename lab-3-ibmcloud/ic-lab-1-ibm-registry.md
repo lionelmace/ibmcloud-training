@@ -307,7 +307,7 @@ Vérifions que notre image est bien présente:
 **Commande #11**
 
 ```
-ibmcloud cr images --restrict lab-registry
+ibmcloud cr images --va --restrict lab-registry
 ```
 
 **Résultat**
