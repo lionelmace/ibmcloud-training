@@ -178,9 +178,41 @@ Voilà qui est fait.
 
 ### Ici Frankfurt
 
-Nous allons utiliser un registre privé sur IBM Cloud hébergé à Frankfurt.
+On va se connecter à IBM Cloud, le temps du lab (l'`API_KEY` vous a -normalement- été fournie par email):
 
 **Commande #6**
+
+```
+ibmcloud login --apikey **API_KEY** -r eu-de -g lab -c 0b5a00334eaf9eb9339d2ab48f7326b4
+```
+
+**Résultat**
+
+```
+API endpoint: https://cloud.ibm.com
+Authenticating...
+OK
+
+Targeted account ACME (0b5a00334eaf9eb9339d2ab48f7326b4) <-> 393750
+
+Targeted resource group lab
+
+Targeted region eu-de
+
+
+API endpoint:      https://cloud.ibm.com
+Region:            eu-de
+User:              first.lastname@fr.ibm.com
+Account:           ACME (0b5a00334eaf9eb9339d2ab48f7326b4) <-> 393750
+Resource group:    lab
+CF API endpoint:
+Org:
+Space:
+```
+
+Nous allons utiliser un registre privé sur IBM Cloud hébergé à Frankfurt.
+
+**Commande #7**
 
 ```
 ibmcloud cr region-set eu-de
@@ -196,7 +228,7 @@ OK
 
 Nous allons maintenant lancer le build de l'image:
 
-**Commande #7**
+**Commande #8**
 
 ```
 docker build -t de.icr.io/lab-registry/node-${USER} --build-arg user=$USER .
@@ -231,7 +263,7 @@ OK
 
 Poussons notre image sur le cloud IBM
 
-**Commande #8**
+**Commande #9**
 
 ```
 docker push de.icr.io/lab-registry/node-${USER}
@@ -259,7 +291,7 @@ unauthorized: The login credentials are not valid, or your IBM Cloud account is 
 
 C'est normal. Il faut d'abord se connecter au registre.
 
-**Commande #9**
+**Commande #10**
 
 ```
 ibmcloud cr login
@@ -276,7 +308,7 @@ OK
 
 On est bien connecte. Relancons le push de l'image
 
-**Commande #10**
+**Commande #11**
 
 ```
 docker push de.icr.io/lab-registry/node-${USER}
@@ -304,7 +336,7 @@ latest: digest: sha256:772e025d88c42e56f59fe8385eaf6fe885fc48535a776514cdb998e5e
 
 Vérifions que notre image est bien présente:
 
-**Commande #11**
+**Commande #12**
 
 ```
 ibmcloud cr images --va --restrict lab-registry
@@ -325,7 +357,7 @@ Super. Selon les cas, vous verrez sûrement les images des autres participants..
 
 À noter que cette image semble avoir des problèmes (`3 issues`). Voyons cela en détails:
 
-**Commande #12**
+**Commande #13**
 
 ```
 ibmcloud cr va de.icr.io/lab-registry/node-lionelmace:latest
