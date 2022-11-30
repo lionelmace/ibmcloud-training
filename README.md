@@ -1,3 +1,3 @@
-# ibmcloud-training
+# IBM Cloud Training
 
-test
+Welcome :-)
