@@ -22,7 +22,8 @@
   - [Lab 2 - IBM Terraform Provider](lab-3-ibmcloud/ic-lab-2-terraform.md)
 
 - Module 2 - Utiliser OpenShift
-  - [Lab 1 - Deploy microservices with OpenShift on IBM Cloud](lab-4-roks/lab-4-openshift.md)
+  - [Lab 1 - Deploy microservices with OpenShift on IBM Cloud](lab-4-roks/lab-1-openshift.md)
+  - [Lab 2 - Persistence Volume Claim](lab-4-roks/lab-2-pvc.md)
 
 <!-- - Module 7 - DevOps
   - [:book: DevOps](lab7-devops/tekton/README.md) -->
