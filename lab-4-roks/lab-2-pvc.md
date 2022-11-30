@@ -1,6 +1,6 @@
 # Deploy an Application with a Persistence Volume
 
-## Test ODF with an example application
+## Deploy the app and the volume
 
 1. Deploy a Persistence Volume Claim.
 
@@ -139,7 +139,7 @@
     oc delete pvc test-claim
     ```
 
-Congratulations! You've deploy an app persisting data into a volume.
+Congratulations! You've deployed an app persisting data into a volume.
 
 ## Resources
 
