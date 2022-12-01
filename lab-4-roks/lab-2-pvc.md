@@ -1,5 +1,10 @@
 # Deploy an Application with a Persistence Volume
 
+## Pre-Requisites
+
+  * Install Infrastructure Service plugin `ibmcloud plugin install infrastructure-service`
+  * Install OpenShift Command Line
+
 ## Deploy the app and the volume
 
 1. Deploy a Persistence Volume Claim.
@@ -52,7 +57,7 @@
 1. View the volume in VPC Block Storage in
 
     ```sh
-    ic is vols
+    ibmcloud is vols
     ```
 
     > The volume is also visible in the console at [VPC Block storage volumes](https://cloud.ibm.com/vpc-ext/storage/storageVolumes)

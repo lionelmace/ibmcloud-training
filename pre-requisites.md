@@ -35,6 +35,7 @@ https://github.com/IBM-Cloud/ibm-cloud-cli-release/releases
     ```sh
     ibmcloud plugin install kubernetes-service
     ibmcloud plugin install container-registry
+    ibmcloud plugin install infrastructure-service
     ```
 
 1. Installer la ligne de commande de Kubernetes: kubectl
