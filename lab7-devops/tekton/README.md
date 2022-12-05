@@ -480,9 +480,9 @@ spec:
 
 This final YAML shows three important concepts:
 
-1. using an existing `Task` from the Tekton Catalog
+1. using the git-clone `Task` 
 2. writing a custom `Task`
-3. starting with a clean build folder and sharing files across tasks by using a `volumeClaimTemplate`. (A `PersistentVolumeClaim` would have used the same persistent volume for every pipeline run rather than a new volume for each pipeline run.)
+3. starting with a clean build folder and sharing files across tasks by using a `PersistentVolumeClaim`. (A ` volumeClaimTemplate` could have been used )
 
 Now do the following:
 
