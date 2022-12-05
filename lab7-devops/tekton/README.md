@@ -900,7 +900,7 @@ spec:
 11. Deploy the new pipeline on the cluster and create a new 'pipeline run'
 ```
 oc apply -f base/pipeline.yaml
-oc create -f base/pipelinerun.yaml
+oc create -f pipelinerun.yaml
 ```
 
 12. Monitor the execution of the pipelinerun 
