@@ -26,4 +26,5 @@
   - [Lab 2 - Persistence Volume Claim](lab-4-roks/lab-2-pvc.md)
 
 - Module 7 - DevOps
-  - [DevOps](lab7-devops/tekton/README.md)
+  - [Lab Tekton](lab7-devops/tekton/README.md)
+  - [Lab GitOps](lab7-devops/gitops/README.md)
