@@ -253,19 +253,19 @@ spec:
     - name: source-repo
       type: string
       description: Source code repository
+  workspaces:
+    - name: pipeline-shared-dat
+  tasks:
+  - name: clone-repository
+    params:
+      - name: url
+        value: "$(params.source-repo)"
+    taskRef:
+      name: git-clone-v0-16-3
+      kind: Task
     workspaces:
-      - name: pipeline-shared-data
-    tasks:
-    - name: clone-repository
-      params:
-        - name: url
-          value: "$(params.source-repo)"
-      taskRef:
-        name: git-clone-v0-16-3
-        kind: Task
-      workspaces:
-        - name: output
-          workspace: pipeline-shared-data
+      - name: output
+        workspace: pipeline-shared-data
 
 ```
 
