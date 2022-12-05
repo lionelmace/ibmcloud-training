@@ -254,7 +254,7 @@ spec:
       type: string
       description: Source code repository
   workspaces:
-    - name: pipeline-shared-dat
+    - name: pipeline-shared-data
   tasks:
   - name: clone-repository
     params:
