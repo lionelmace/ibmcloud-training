@@ -398,13 +398,8 @@ spec:
     name: pipeline-nextapp
   workspaces:
     - name: pipeline-shared-data
-      volumeClaimTemplate:
-        spec:
-          resources:
-            requests:
-              storage: 1Gi
-          accessModes:
-            - ReadWriteOnce
+      persistentVolumeClaim:
+        claimName: nextapp-pipeline # this PVC must already exist
 ```
 Run the pipeline again
 
