@@ -897,13 +897,13 @@ spec:
             - ReadWriteOnce
 ```
 
-21. Deploy the new pipeline on the cluster and create a new 'pipeline run'
+11. Deploy the new pipeline on the cluster and create a new 'pipeline run'
 ```
 oc apply -f base/pipeline.yaml
 oc create -f base/pipelinerun.yaml
 ```
 
-22. Monitor the execution of the pipelinerun 
+12. Monitor the execution of the pipelinerun 
 
 ![buildah-end.png](images/buildah-end.png)
 
