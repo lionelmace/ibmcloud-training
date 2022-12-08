@@ -202,7 +202,7 @@ The objective of this worked example is to show how to introduce GitOps in a CI/
           - name: GIT_SCRIPT
             value: |
               cp /root/.ssh/ssh-directory/ssh-privatekey /root/.ssh/id_rsa
-              ssh-keyscan -t rsa github.ibm.com > /root/.ssh/known_hosts
+              ssh-keyscan -t rsa github.com > /root/.ssh/known_hosts
               cd /workspace/source
               git checkout main
               git add base/kustomization.yaml
